@@ -8,11 +8,7 @@ BLACK = "#000000"
 BGDARKGREY = "bgDarkGrey.TFrame"
 
 #algorithm
-BEFS = "BeFS"
-AT = "At"
-AKT = "Akt"
-STARA = "A*"
+BACKTRACKING = "Backtracking"
+DANCINGLINK = "Dancing links"
 
 #tab
-CAY = "Cây"
-MATRAN = "Ma trận"

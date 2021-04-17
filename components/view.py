@@ -6,7 +6,7 @@ class MainPage():
     def __init__(self):
         self._window = Tk()
         self._window.title("Giải sudoku theo thời gian thực")
-        self._window.geometry("800x580")
+        self._window.geometry("800x650")
         
         self.main_window(self._window)
 
