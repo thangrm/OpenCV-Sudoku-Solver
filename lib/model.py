@@ -80,6 +80,9 @@ class Model:
     def load_model_from_file(self,path):
         self.model.load_weights(path)
 
+    def predict_digital(self,Img):
+        return self.model.predict([Img])
+
 if __name__ == "__main__":
     model = Model()
     model.train_model()
