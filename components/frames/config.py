@@ -9,6 +9,6 @@ BGDARKGREY = "bgDarkGrey.TFrame"
 
 #algorithm
 BACKTRACKING = "Backtracking"
-DANCINGLINK = "Dancing links"
+BeFS = "BeFS"
 
 #tab

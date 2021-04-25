@@ -3,17 +3,26 @@ from tkinter import (Button, Label, Entry, LabelFrame, StringVar, messagebox, Ca
 from tkinter import Tk, END, LEFT, RIGHT, TOP, BOTTOM, CENTER, BOTH
 from tkinter import RAISED, GROOVE, SUNKEN, RIDGE, LAST, DISABLED, NORMAL
 from tkinter.ttk import Style, Notebook, Combobox, Frame
-from components.frames.config import BGWHITE, WHITE, BGDARKGREY, BACKTRACKING, DANCINGLINK
+from components.frames.config import BGWHITE, WHITE, BGDARKGREY, BACKTRACKING, BeFS
 from lib.global_variable import set_variable, get_variable
+from lib.findsudokuboard import find_sudoku_board
+from lib.splitsudokuboard import split_sudoku_board_to_array
+#from lib.algorithm import 
 from cv2 import cv2
+import os
 import PIL
 from PIL import Image,ImageTk
+import time
 
 class CameraFrame(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent, style=BGWHITE, borderwidth=0)
         self._parent = parent
+        self.run = False
+        self.model = get_variable("model")
+        self.old_sudoku = None
         self.__initUI()
+
 
     def __initUI(self):
         self.pack(side=LEFT, fill="both", expand=True)
@@ -34,7 +43,7 @@ class CameraFrame(Frame):
         self.cameraChoosen = Combobox(
         self.topMenuFrame, state="readonly", textvariable=self.camera_value, font="Arial 12")
         self.cameraChoosen["values"] = tuple(map(str, self.return_camera_indexes()))
-        self.cameraChoosen.current(0)
+        #self.cameraChoosen.current(0)
         self.cameraChoosen.grid(column=1, row=0, pady=2)
 
         Label(self.topMenuFrame, text="Thuật toán",
@@ -42,20 +51,19 @@ class CameraFrame(Frame):
         self.alg_value = StringVar()
         self.algChoosen = Combobox(
             self.topMenuFrame, state="readonly", textvariable=self.alg_value, font="Arial 12")
-        self.algChoosen["values"] = (BACKTRACKING, DANCINGLINK)
+        self.algChoosen["values"] = (BACKTRACKING, BeFS)
         self.algChoosen.current(0)
         self.algChoosen.grid(column=3, row=0, pady=2)
 
         self.btnSave = Button(self.topMenuFrame,state=DISABLED, relief=RIDGE, borderwidth=1, text="Lưu")
-        self.btnRun = Button(self.topMenuFrame, text="Bắt đầu", command = self.start_run_camera)
+        self.btnRun = Button(self.topMenuFrame, text="Bắt đầu", command = self.btn_run_click)
         self.btnSave.grid(column=4, row=0, padx=5)
         self.btnRun.grid(column=5, row=0, padx=5)
 
         #show camera
-        self.showCameraFrame = Frame(self.wrapCamera, relief=GROOVE, borderwidth=5, height=430, style=BGDARKGREY)
+        self.showCameraFrame = Frame(self.wrapCamera, relief=GROOVE, borderwidth=5, height=500, style=BGDARKGREY)
         self.showCameraFrame.pack(fill=BOTH, padx=10)
-        self.lbCamera = Label(self.showCameraFrame)
-        self.lbCamera.pack(fill=BOTH)
+        self.lbCamera = None
 
     def return_camera_indexes(self):
         index = 1
@@ -71,20 +79,72 @@ class CameraFrame(Frame):
         cv2.destroyAllWindows()
         return arr
 
+    def btn_run_click(self):
+        if(self.run):
+            self.stop_run_camera()
+        else:
+            self.start_run_camera()
+
+    def stop_run_camera(self):
+        self.btnRun['text'] = "Bắt đầu"
+        self.run = False
+        cv2.destroyAllWindows()
+
     def start_run_camera(self):
-        width, height = 500, 300
+        if(self.lbCamera == None):
+            self.lbCamera = Label(self.showCameraFrame)
+            self.lbCamera.pack(fill=BOTH,ipady=3)
+        #width, height = 500, 300
         cap = cv2.VideoCapture(0)
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
-
+#        cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+#        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+        self.btnRun['text'] = "Dừng lại"
+        self.run = True
         def show_frame():
-            _, frame = cap.read()
-            frame = cv2.flip(frame, 1)
-            cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
-            img = PIL.Image.fromarray(cv2image)
-            imgtk = ImageTk.PhotoImage(image=img)
-            self.lbCamera.imgtk = imgtk
-            self.lbCamera.configure(image=imgtk)
-            self.lbCamera.after(10, show_frame)
-
+            ret, frame = cap.read()
+            #frame = cv2.flip(frame, 1)
+            if ret:
+                result = self.recognize_and_solve_sudoku(frame)        
+                img = PIL.Image.fromarray(result)
+                imgtk = ImageTk.PhotoImage(image=img)
+                self.lbCamera.imgtk = imgtk
+                self.lbCamera.configure(image=imgtk)
+                #print(self.run)
+            if self.run:
+                self.lbCamera.after(10, show_frame)
+            else:
+                cap.release()
+                cv2.destroyAllWindows()
         show_frame()
+    
+    def recognize_and_solve_sudoku(self,image):
+        # Tìm bảng sudoku
+        sudokuBoardImg, isSudoku = find_sudoku_board(image)
+        
+        # Nếu không có bảng sudoku trả lại ảnh gốc
+        if not isSudoku:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
+            return image
+
+        # Lấy mảng chứa đề sudoku (mảng 9x9)
+        result, isSolve =  split_sudoku_board_to_array(sudokuBoardImg,self.model, self.alg_value.get())
+
+        if isSolve:
+            self.stop_run_camera()
+            directory = r'C:\Users\Moon\Downloads\Code\OpenCV-Sudoku-Solver\image'
+            os.chdir(directory)
+            filename = str(int(time.time())) + ".png"
+            cv2.imwrite(filename, image)
+            #result = cv2.cvtColor(result, cv2.COLOR_BGR2RGBA)
+            return result
+
+        else:
+            MsgBox = messagebox.askquestion ('Camera','Chưa phân tích được bảng sudoku, bạn có muốn thử lại ?',icon = 'question')
+            print (MsgBox)
+            if MsgBox != 'yes':
+                self.stop_run_camera()
+
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
+        return image
+        
+

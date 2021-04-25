@@ -11,7 +11,6 @@ def angle_between(vector_1, vector_2):
     unit_vector2 = vector_2 / np.linalg.norm(vector_2)
     dot_droduct = np.dot(unit_vector_1, unit_vector2)
     angle = np.arccos(dot_droduct) *  57.2958  # chuyển từ radian về độ
-    print(angle)
     return angle
 
 # hàm kiểm tra xem 2 vector có tạo thành 1 góc 90 độ không
@@ -29,6 +28,7 @@ def check_square_size(A, B, C, D, epsilon):
 
     shortest = min(AB, BC, CD, DA)
     longest = max(AB, BC, CD, DA)
+    print(shortest/longest)
     return (epsilon/100) * longest < shortest
 
 # hàm tìm các góc của đường viền
@@ -71,8 +71,8 @@ def find_sudoku_board(img):
     for line in contours:
         area = cv2.contourArea(line)
         if area > 50000:
-            print("=======================================\n")
-            print(area)
+            #print("=======================================\n")
+            #print(area)
             # Lấy ra 4 góc của đường viền
             corners = get_corners_from_contours(line, 4)
             if corners is None:         # Không phải là sudoku
@@ -133,8 +133,8 @@ def find_sudoku_board(img):
             #print(AB,AD,CB,CD)
             if approx_90_degrees(AB,AD,20) and approx_90_degrees(CB,CD,20):
                 #print("4 góc vuông")
-                if check_square_size(A, B, C, D, 90):
-                    #print("4 cạnh bằng nhau => Là hình vuông")
+                if check_square_size(A, B, C, D, 96):
+                    print("4 cạnh bằng nhau => Là hình vuông")
 
                     # Tìm chiều rộng của bảng sudoku
                     width_A = math.sqrt((B[0]-A[0])**2 + (B[1]-A[1])**2)
@@ -159,6 +159,6 @@ def find_sudoku_board(img):
                     # Tính ma trận biến đổi ảnh để wrap lại ảnh
                     perspective_transformed_matrix = cv2.getPerspectiveTransform(square, dst)
                     warp = cv2.warpPerspective(img, perspective_transformed_matrix, (max_width, max_height))
-                    #cv2.imshow("warp",warp)
 
-                    return warp
+                    return warp, True
+    return None, False
