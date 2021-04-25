@@ -9,7 +9,10 @@ class MainPage():
         self._window = Tk()
         self._window.title("Giải sudoku theo thời gian thực")
         self._window.geometry("800x650")
-        
+
+        path = os.path.dirname(os.path.abspath(__file__))
+        self._window.iconbitmap(os.path.join(path,'sudoku.ico'))
+
         self.config_global_variable()
         self.main_window(self._window)
 

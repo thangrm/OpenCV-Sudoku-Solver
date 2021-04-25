@@ -7,7 +7,7 @@ from components.frames.config import BGWHITE, WHITE, BGDARKGREY, BACKTRACKING, B
 from lib.global_variable import set_variable, get_variable
 from lib.findsudokuboard import find_sudoku_board
 from lib.splitsudokuboard import split_sudoku_board_to_array
-#from lib.algorithm import 
+
 from cv2 import cv2
 import os
 import PIL
@@ -37,14 +37,14 @@ class CameraFrame(Frame):
         self.topMenuFrame = Frame(self.wrapMenu, style=BGWHITE)
         self.topMenuFrame.pack()
 
-        Label(self.topMenuFrame, text="Camera", bg=WHITE).grid(
-            column=0, row=0, padx=10)
-        self.camera_value = StringVar()
-        self.cameraChoosen = Combobox(
-        self.topMenuFrame, state="readonly", textvariable=self.camera_value, font="Arial 12")
-        self.cameraChoosen["values"] = tuple(map(str, self.return_camera_indexes()))
-        #self.cameraChoosen.current(0)
-        self.cameraChoosen.grid(column=1, row=0, pady=2)
+        # Label(self.topMenuFrame, text="Camera", bg=WHITE).grid(
+        #     column=0, row=0, padx=10)
+        # self.camera_value = StringVar()
+        # self.cameraChoosen = Combobox(
+        # self.topMenuFrame, state="readonly", textvariable=self.camera_value, font="Arial 12")
+        # self.cameraChoosen["values"] = tuple(map(str, self.return_camera_indexes()))
+        # #self.cameraChoosen.current(0)
+        # self.cameraChoosen.grid(column=1, row=0, pady=2)
 
         Label(self.topMenuFrame, text="Thuật toán",
               bg=WHITE).grid(column=2, row=0, padx=10)
@@ -55,9 +55,9 @@ class CameraFrame(Frame):
         self.algChoosen.current(0)
         self.algChoosen.grid(column=3, row=0, pady=2)
 
-        self.btnSave = Button(self.topMenuFrame,state=DISABLED, relief=RIDGE, borderwidth=1, text="Lưu")
+        # self.btnSave = Button(self.topMenuFrame,state=DISABLED, relief=RIDGE, borderwidth=1, text="Lưu")
+        # self.btnSave.grid(column=4, row=0, padx=5)
         self.btnRun = Button(self.topMenuFrame, text="Bắt đầu", command = self.btn_run_click)
-        self.btnSave.grid(column=4, row=0, padx=5)
         self.btnRun.grid(column=5, row=0, padx=5)
 
         #show camera

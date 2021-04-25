@@ -2,7 +2,7 @@ from tkinter import (Button, Label, Entry, LabelFrame, StringVar, messagebox, Ca
                      Listbox,OptionMenu, scrolledtext,ttk)
 from tkinter import Tk, END, LEFT, RIGHT, TOP, BOTTOM,CENTER, BOTH, RAISED, GROOVE,LAST
 from tkinter.ttk import Style, Notebook, Combobox, Frame
-from components.frames.config import BGWHITE, WHITE, BGDARKGREY
+from components.frames.config import BGWHITE, WHITE, BGDARKGREY, GREY, DARKGREY
 from lib.global_variable import set_variable,get_variable
 
 class SupportFrame(Frame):
@@ -23,6 +23,7 @@ class SupportFrame(Frame):
         #Logo in left side
         self.logoFrame = Frame(self.wrapLeft, width=150, height=150, relief=GROOVE, borderwidth=5 ,style=BGDARKGREY)
         self.logoFrame.pack(padx=60, pady=50)
+        Label(self.logoFrame, text= "N2", font="Courier 32", bg=DARKGREY, justify=LEFT).pack(ipadx=20, ipady=20)
 
 
         #infor in right side
