@@ -24,7 +24,7 @@ class MainPage():
         path = os.path.dirname(os.path.abspath(__file__))
         path = os.path.abspath(os.path.join(path, os.pardir))
         path = os.path.join(path,'lib')
-        path = os.path.join(path,'digitalModel.h5')
+        path = os.path.join(path,'digitalModelWithoutZero.h5')
         
         model = Model()
         model.load_model_from_file(path)

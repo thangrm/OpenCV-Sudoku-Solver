@@ -88,6 +88,7 @@ def find_sudoku_board(img):
             tempCorners = np.copy(corners)
             
             # Tìm điểm trên cùng bên trái - tổng tọa độ nhỏ nhất
+
             sum = tempCorners[0][0]+tempCorners[0][1]
             index = 0
             for i in range(4):
@@ -133,7 +134,7 @@ def find_sudoku_board(img):
             #print(AB,AD,CB,CD)
             if approx_90_degrees(AB,AD,20) and approx_90_degrees(CB,CD,20):
                 #print("4 góc vuông")
-                if check_square_size(A, B, C, D, 96):
+                if check_square_size(A, B, C, D, 98):
                     print("4 cạnh bằng nhau => Là hình vuông")
 
                     # Tìm chiều rộng của bảng sudoku

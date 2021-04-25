@@ -32,6 +32,12 @@ class Model:
         # Test có 10000
         (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
 
+        # loại bỏ số 0 khỏi dữ liệu
+        x_train, y_train = remove(0, x_train, y_train)
+        x_test, y_test = remove(0, x_test, y_test)
+        print(x_train.shape[0], "train samples")
+        print(x_test.shape[0], "test samples")
+
         # Chia tỷ lệ hình ảnh theo phạm vi [0, 1]
         x_train = x_train.astype("float32") / 255
         x_test = x_test.astype("float32") / 255
@@ -53,7 +59,7 @@ class Model:
         """
 
         self.batch_size = 128
-        self.epochs = 15
+        self.epochs = 1
 
         self.model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
@@ -82,6 +88,11 @@ class Model:
 
     def predict_digital(self,Img):
         return self.model.predict([Img])
+
+def remove(digit, x, y):
+    idx = (y != digit).nonzero()
+    return x[idx], y[idx]
+
 
 if __name__ == "__main__":
     model = Model()

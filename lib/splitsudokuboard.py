@@ -6,7 +6,7 @@ import math
 from cv2 import cv2
 from scipy import ndimage
 from lib.model import Model
-from lib.algorithm import solve_sudoku_BeFS, all_board_non_zero, boardBackTracking
+from lib.algorithm import solve_sudoku_BeFS, isNonZero, boardBackTracking
 from components.frames.config import BACKTRACKING, BeFS
 
 import time
@@ -19,7 +19,7 @@ def get_best_shift(img):
     shifty = np.round(rows/2.0-cy).astype(int)
     return shiftx, shifty
 
-# Thay đổi hình ảnh bằng giá trị của hafmg get_best_shift
+# Thay đổi hình ảnh bằng giá trị của hàm get_best_shift
 def shift(img,sx,sy):
     rows,cols = img.shape
     M = np.float32([[1,0,sx],[0,1,sy]])
@@ -36,32 +36,6 @@ def prepare(img_array):
 def showImg(image):
     cv2.imshow('Image',image)
     cv2.waitKey(0)
-
-def write_solution_on_image(image, grid, user_grid):
-    # Write grid on image
-    SIZE = 9
-    width = image.shape[1] // 9
-    height = image.shape[0] // 9
-    for i in range(SIZE):
-        for j in range(SIZE):
-            if(user_grid[i][j] != 0):    # If user fill this cell
-                continue                # Move on
-            text = str(grid[i][j])
-            off_set_x = width // 15
-            off_set_y = height // 15
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            (text_height, text_width), baseLine = cv2.getTextSize(text, font, fontScale=1, thickness=3)
-            # marginX = math.floor(width / 7)
-            # marginY = math.floor(height / 7)
-        
-            font_scale = 0.6 * min(width, height) / max(text_height, text_width)
-            text_height *= font_scale
-            text_width *= font_scale
-            bottom_left_corner_x = width*j + math.floor((width - text_width) / 2) + off_set_x
-            bottom_left_corner_y = height*(i+1) - math.floor((height - text_height) / 2) + off_set_y
-            image = cv2.putText(image, text, (bottom_left_corner_x, bottom_left_corner_y), 
-                                                  font, font_scale, (0,255,0), thickness=3, lineType=cv2.LINE_AA)
-    return image
 
 # đầu vào là một ảnh chỉ chứa bảng sudoku
 def split_sudoku_board_to_array(warp, model, alg): 
@@ -153,7 +127,7 @@ def split_sudoku_board_to_array(warp, model, alg):
             shifted = shift(crop_image,shift_x,shift_y)
             crop_image = shifted
             
-            imgTemp = np.copy(crop_image)
+            #imgTemp = np.copy(crop_image)
 
             # Đưa ảnh về dạng chuẩn để nhận dạng
             crop_image = prepare(crop_image)
@@ -170,10 +144,12 @@ def split_sudoku_board_to_array(warp, model, alg):
             #print(t1-t0)
 
             print("[" + str(i) + ":" + str(j) + "] = " + str(np.argmax(prediction[0])))
-            if(np.argmax(prediction[0]) == 3):
-                showImg(imgTemp)
-
-    #return warp
+            # if(np.argmax(prediction[0]) == 3):
+            #     showImg(imgTemp)
+    
+    """
+    Giải sudoku và viết kết quả lên ảnh
+    """
     user_grid = copy.deepcopy(grid)
     if alg == BeFS:
         print(BeFS)
@@ -182,13 +158,12 @@ def split_sudoku_board_to_array(warp, model, alg):
         print(BACKTRACKING)
         grid, _ = boardBackTracking(grid)
     else:
-        print(BACKTRACKING)
         solve_sudoku_BeFS(grid)
 
     for line in grid:
         print(line)
 
-    if(all_board_non_zero(grid)): # If we got a solution
+    if(isNonZero(grid)): # If we got a solution
         orginal_warp = write_solution_on_image(orginal_warp, grid, user_grid)  
         return orginal_warp, True
 
@@ -200,3 +175,28 @@ def split_sudoku_board_to_array(warp, model, alg):
     return orginal_warp, False
 
  
+def write_solution_on_image(image, grid, user_grid):
+    # Write grid on image
+    SIZE = 9
+    width = image.shape[1] // 9
+    height = image.shape[0] // 9
+    for i in range(SIZE):
+        for j in range(SIZE):
+            if(user_grid[i][j] != 0):    # If user fill this cell
+                continue                # Move on
+            text = str(grid[i][j])
+            off_set_x = width // 15
+            off_set_y = height // 15
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            (text_height, text_width), _ = cv2.getTextSize(text, font, fontScale=1, thickness=3)
+            # marginX = math.floor(width / 7)
+            # marginY = math.floor(height / 7)
+        
+            font_scale = 0.6 * min(width, height) / max(text_height, text_width)
+            text_height *= font_scale
+            text_width *= font_scale
+            bottom_left_corner_x = width*j + math.floor((width - text_width) / 2) + off_set_x
+            bottom_left_corner_y = height*(i+1) - math.floor((height - text_height) / 2) + off_set_y
+            image = cv2.putText(image, text, (bottom_left_corner_x, bottom_left_corner_y), 
+                                                  font, font_scale, (0,255,0), thickness=3, lineType=cv2.LINE_AA)
+    return image

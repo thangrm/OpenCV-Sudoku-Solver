@@ -3,105 +3,104 @@ import time
 """
 BeFS 
 """
+# Giải thuật cho bài toán Sudoku
+# Tối ưu thuật toán Backtracking dựa BeFS
+# với heuristic là số lượng lựa chọn có thể có của một ô
+
+# Class chứa data của một ô
+# Giải thuật cho bài toán Sudoku
+# Tối ưu thuật toán Backtracking dựa BeFS
+# với heuristic là số lượng lựa chọn có thể có của một ô
+
+# Class chứa data của một ô
 class EntryData:
     def __init__(self, r, c, n):
         self.row = r
         self.col = c
         self.choices = n
 
-    def set_data(self, r, c, n):
+    def setData(self, r, c, n):
         self.row = r
         self.col = c
         self.choices = n
 
-# Solve Sudoku using Best-first search
 def solve_sudoku_BeFS(matrix):
     cont = [True]
-    # See if it is even possible to have a solution
-    for i in range(9):
-        for j in range(9):
-            if not can_be_correct(matrix, i, j): # If it is not possible, stop
+    # Kiểm tra xem bài toán có thể giải được hay không
+    for row in range(9):
+        for col in range(9):
+            if not isCorrect(matrix, row, col):
                 return
-    sudoku_helper(matrix, cont) # Otherwise try to solve the Sudoku puzzle
+    sudoku_helper(matrix, cont)
 
-# Helper function - The heart of Best First Search
 def sudoku_helper(matrix, cont):
-    if not cont[0]: # Stopping point 1
+    if not cont[0]:
         return
 
-    # Find the best entry (The one with the least possibilities)
-    best_candidate = EntryData(-1, -1, 100)
-    for i in range(9):
-        for j in range(9):
-            if matrix[i][j] == 0: # If it is unfilled
-                num_choices = count_choices(matrix, i, j)
-                if best_candidate.choices > num_choices:
-                    best_candidate.set_data(i, j, num_choices)
+    # Tìm ô có số lượng lựa chọn ( khả năng chọn số từ 1 - 9 ) ít nhất
+    bestCell = EntryData(-1, -1, 100)
+    for row in range(9):
+        for col in range(9):
+            if matrix[row][col] == 0:
+                num_choices = count_choices(matrix, row, col)
+                if bestCell.choices > num_choices:
+                    bestCell.setData(row, col, num_choices)
 
-    # If didn't find any choices, it means...
-    if best_candidate.choices == 100: # Has filled all board, Best-First Search done! Note, whether we have a solution or not depends on whether all Board is non-zero
-        cont[0] = False # Set the flag so that the rest of the recursive calls can stop at "stopping points"
+    
+    if bestCell.choices == 100: 
+        cont[0] = False 
         return
 
-    row = best_candidate.row
-    col = best_candidate.col
+    row = bestCell.row
+    col = bestCell.col
 
-    # If found the best candidate, try to fill 1-9
-    for j in range(1, 10):
-        if not cont[0]: # Stopping point 2
+    for value in range(1, 10):
+        if not cont[0]:
             return
 
-        matrix[row][col] = j
+        matrix[row][col] = value
 
-        if can_be_correct(matrix, row, col):
+        if isCorrect(matrix, row, col):
             sudoku_helper(matrix, cont)
 
-    if not cont[0]: # Stopping point 3
+    if not cont[0]:
         return
-    matrix[row][col] = 0 # Backtrack, mark the current cell empty again
+    #Backtracking
+    matrix[row][col] = 0 
             
 
-# Count the number of choices haven't been used
+# Đếm số lượng các số có thể điền vào trong ô có vị trí i,j (Tính heuristic)
 def count_choices(matrix, i, j):
-    can_pick = [True,True,True,True,True,True,True,True,True,True]; # From 0 to 9 - drop 0
+    canPick = [True,True,True,True,True,True,True,True,True,True] 
     
-    # Check row
     for k in range(9):
-        can_pick[matrix[i][k]] = False
+        canPick[matrix[i][k]] = False
 
-    # Check col
     for k in range(9):
-        can_pick[matrix[k][j]] = False
+        canPick[matrix[k][j]] = False
 
-    # Check 3x3 square
     r = i // 3
     c = j // 3
     for row in range(r*3, r*3+3):
         for col in range(c*3, c*3+3):
-            can_pick[matrix[row][col]] = False
+            canPick[matrix[row][col]] = False
 
-    # Count
     count = 0
-    for k in range(1, 10):  # 1 to 9
-        if can_pick[k]:
+    for value in range(1, 10): 
+        if canPick[value]:
             count += 1
 
     return count
 
-# Return true if the current cell doesn't create any violation
-def can_be_correct(matrix, row, col):
-    
-    # Check row
+def isCorrect(matrix, row, col):
     for c in range(9):
         if matrix[row][col] != 0 and col != c and matrix[row][col] == matrix[row][c]:
             return False
 
-    # Check column
     for r in range(9):
         if matrix[row][col] != 0 and row != r and matrix[row][col] == matrix[r][col]:
             return False
 
-    # Check 3x3 square
     r = row // 3
     c = col // 3
     for i in range(r*3, r*3+3):
@@ -111,15 +110,12 @@ def can_be_correct(matrix, row, col):
     
     return True
 
-# Return true if the whole board has been occupied by some non-zero number
-# If this happens, the current board is the solution to the original Sudoku
-def all_board_non_zero(matrix):
+def isNonZero(matrix):
     for i in range(9):
         for j in range(9):
             if matrix[i][j] == 0:
                 return False
     return True
-
 
 """
 Backtracking

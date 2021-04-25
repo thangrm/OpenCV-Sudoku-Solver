@@ -16,6 +16,7 @@ from keras.models import model_from_json
 from lib.model import Model
 from lib.findsudokuboard import find_sudoku_board
 from lib.splitsudokuboard import split_sudoku_board_to_array
+#from components.frame.config import Backtracking
 
 # physical_devices = tf.config.list_physical_devices("GPU")
 # tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -72,7 +73,7 @@ while(True):
         if isSudoku:
             print("Hello")
             # Lấy mảng chứa đề sudoku (mảng 9x9)
-            sudoku =  split_sudoku_board_to_array(sudokuBoardImg, model)
+            sudoku =  split_sudoku_board_to_array(sudokuBoardImg, model, Backtracking)
             showImage(sudoku, "Real Time Sudoku Solver", 1066, 600) # Print the 'solved' image
             cv2.waitKey(0)
             break
