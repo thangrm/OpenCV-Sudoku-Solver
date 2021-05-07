@@ -131,10 +131,10 @@ class CameraFrame(Frame):
 
         if isSolve:
             self.stop_run_camera()
-            directory = r'C:\Users\Moon\Downloads\Code\OpenCV-Sudoku-Solver\image'
-            os.chdir(directory)
-            filename = str(int(time.time())) + ".png"
-            cv2.imwrite(filename, image)
+            #directory = r'image'
+            #os.chdir(directory)
+            #filename = str(int(time.time())) + ".png"
+            #cv2.imwrite(filename, image)
             #result = cv2.cvtColor(result, cv2.COLOR_BGR2RGBA)
             return result
 

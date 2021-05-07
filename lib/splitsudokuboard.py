@@ -39,7 +39,7 @@ def showImg(image):
 
 # đầu vào là một ảnh chỉ chứa bảng sudoku
 def split_sudoku_board_to_array(warp, model, alg): 
-    showImg(warp)
+    #showImg(warp)
     orginal_warp = np.copy(warp)
     warp = cv2.cvtColor(warp,cv2.COLOR_BGR2GRAY)
     warp = cv2.GaussianBlur(warp, (5,5), 0)
@@ -95,7 +95,7 @@ def split_sudoku_board_to_array(warp, model, alg):
             # Kiểm tra xem ô có chứa số không
 
             # Ô nào có quá ít pixel đen thì coi đó là ô trắng
-            print("full : " + str(crop_image.sum()  / (digit_pic_size**2*255)))
+            #print("full : " + str(crop_image.sum()  / (digit_pic_size**2*255)))
             if crop_image.sum() >= digit_pic_size**2*255 - digit_pic_size * 1 * 255:
                 grid[i][j] == 0
                 continue    
@@ -113,7 +113,7 @@ def split_sudoku_board_to_array(warp, model, alg):
             if center_region.sum() >= (center_width * center_height * 255 * 0.8):
                 grid[i][j] = 0
                 continue                    
-            print("center : " + str(center_region.sum() / (center_width * center_height * 255)))
+            #print("center : " + str(center_region.sum() / (center_width * center_height * 255)))
             
             # Giờ chỉ còn những ô chứa số cần được xử lý
 
